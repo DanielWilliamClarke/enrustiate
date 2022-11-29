@@ -18,6 +18,14 @@ cargo build
 cargo run -- 999999999999999
 # Output: nine hundred and ninety nine trillion nine hundred and ninety nine billion nine hundred and ninety nine million nine hundred and ninety nine thousand nine hundred and ninety nine
 
+# Ahem
+cargo build --release -Z unstable-options --out-dir ./bin 
+./bin/numbers_to_words 999999999999999
+# Output: nine hundred and ninety nine trillion nine hundred and ninety nine billion nine hundred and ninety nine million nine hundred and ninety nine thousand nine hundred and ninety nine
+
 # Test
-cargo test
+cargo test -p numbers_to_words
+
+# Bench
+cargo bench
 ```

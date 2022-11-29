@@ -5,7 +5,7 @@ use crate::{validation_errors::InputError, validator::Validator};
 pub struct NumberToWords<N>(N);
 
 impl<N> NumberToWords<N> {
-    fn new(input: N) -> Self {
+    pub fn new(input: N) -> Self {
         NumberToWords(input)
     }
 }

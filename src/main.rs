@@ -1,9 +1,6 @@
-mod numbers_to_words;
-mod validation_errors;
-mod validator;
-
 use std::env;
-use crate::{numbers_to_words::NumberToWords, validator::Validator};
+
+use numbers_to_words::{NumberToWords, Validator};
 
 fn main() {
     let args: Vec<String> = env::args().collect::<Vec<String>>();
