@@ -19,18 +19,11 @@ where
     type Error = InputError<N>;
 
     fn validate(input: String, low: Self::Bounds, high: Self::Bounds) -> Result<Self::Output, Self::Error> {
-        let parsed_input = match input.parse::<N>() {
-            Ok(input) if input < low || input > high => Err(input),
-            Ok(input) => Ok(input),
-            Err(_) => Err(InputError::ParseError(input.clone()))?,
-        };
-    
-        let valid_input = match parsed_input {
-            Ok(input) => input,
-            Err(err) => Err(InputError::ValidationError(err))?,
-        };
-    
-       Ok(NumberToWords::new(valid_input))
+        match input.parse::<N>() {
+            Err(_) => Err(InputError::ParseError(input.clone())),
+            Ok(val) if val < low || val > high => Err(InputError::ValidationError(val)),
+            Ok(val) => Ok(NumberToWords::new(val)),
+        }
     }
 }
 
@@ -74,7 +67,6 @@ impl Display for NumberToWords<i32> {
             },
             100..=999 => {
                 let mod_hundred = self.0 % 100;
-
                 if mod_hundred == 0 {
                     return write!(f, "{} hundred", NumberToWords::new(self.0 / 100))
                 }

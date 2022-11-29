@@ -8,14 +8,9 @@ use crate::{numbers_to_words::NumberToWords, validator::Validator};
 fn main() {
     let args: Vec<String> = env::args().collect::<Vec<String>>();
     let input = args[1].clone();
-    // let input = "12055".to_string();
 
-    let validation = NumberToWords::validate(input, 0, 1_000_000);
-
-    match validation {
-        Ok(mapper) => {
-            print!("{}", mapper);
-        }
-        Err(err) => println!("{}", err),
+    match NumberToWords::validate(input, 0, 1_000_000) {
+        Ok(renderer) => print!("Output: {}", renderer),
+        Err(err) => println!("Error: {}", err),
     }
 }
