@@ -1,4 +1,6 @@
 use criterion::{criterion_group, criterion_main, Criterion};
+use number_renderer::NumbersToWords;
+
 
 fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("display all the nines", |b| {
@@ -23,7 +25,7 @@ fn criterion_benchmark(c: &mut Criterion) {
             pyramid_of_nines   
                 .iter()
                 .for_each(|n| {
-                    format!("{}", numbers_to_words::NumberToWords::new(n.to_owned()));
+                    format!("{}", NumbersToWords::new(n.to_owned()));
                 })
         })
     });

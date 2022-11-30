@@ -2,20 +2,20 @@ use std::{fmt::Display, str::FromStr};
 
 use crate::{validation_errors::InputError, validator::Validator};
 
-pub struct NumberToWords<N>(N);
+pub struct NumbersToWords<N>(N);
 
-impl<N> NumberToWords<N> {
+impl<N> NumbersToWords<N> {
     pub fn new(input: N) -> Self {
-        NumberToWords(input)
+        NumbersToWords(input)
     }
 }
 
-impl<N> Validator for NumberToWords<N>
+impl<N> Validator for NumbersToWords<N>
 where
     N: Display + FromStr + PartialOrd,
 {
     type Bounds = N;
-    type Output = NumberToWords<N>;
+    type Output = NumbersToWords<N>;
     type Error = InputError<N>;
 
     fn validate(
@@ -26,12 +26,12 @@ where
         match input.parse::<N>() {
             Err(_) => Err(InputError::ParseError(input.clone())),
             Ok(val) if val < low || val > high => Err(InputError::ValidationError(val)),
-            Ok(val) => Ok(NumberToWords::new(val)),
+            Ok(val) => Ok(NumbersToWords::new(val)),
         }
     }
 }
 
-impl NumberToWords<i64> {
+impl NumbersToWords<i64> {
     fn render(
         &self,
         f: &mut std::fmt::Formatter<'_>,
@@ -41,7 +41,7 @@ impl NumberToWords<i64> {
     ) -> std::fmt::Result {
         let mod_mag = self.0 % mod_val;
         if mod_mag == 0 {
-            return write!(f, "{} {}", NumberToWords::new(self.0 / mod_val), mag);
+            return write!(f, "{} {}", NumbersToWords::new(self.0 / mod_val), mag);
         }
 
         let mut delim = "";
@@ -52,14 +52,14 @@ impl NumberToWords<i64> {
         write!(
             f,
             "{} {}{}",
-            NumberToWords::new(self.0 - mod_mag),
+            NumbersToWords::new(self.0 - mod_mag),
             delim,
-            NumberToWords::new(mod_mag)
+            NumbersToWords::new(mod_mag)
         )
     }
 }
 
-impl Display for NumberToWords<i64> {
+impl Display for NumbersToWords<i64> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.0 {
             0 => write!(f, "zero"),
@@ -95,21 +95,21 @@ impl Display for NumberToWords<i64> {
                 write!(
                     f,
                     "{} {}",
-                    NumberToWords::new(self.0 - mod_ten),
-                    NumberToWords::new(mod_ten)
+                    NumbersToWords::new(self.0 - mod_ten),
+                    NumbersToWords::new(mod_ten)
                 )
             }
             100..=999 => {
                 let mod_hundred = self.0 % 100;
                 if mod_hundred == 0 {
-                    return write!(f, "{} hundred", NumberToWords::new(self.0 / 100));
+                    return write!(f, "{} hundred", NumbersToWords::new(self.0 / 100));
                 }
 
                 write!(
                     f,
                     "{} and {}",
-                    NumberToWords::new(self.0 - mod_hundred),
-                    NumberToWords::new(mod_hundred)
+                    NumbersToWords::new(self.0 - mod_hundred),
+                    NumbersToWords::new(mod_hundred)
                 )
             }
             1000..=9_99_999 => {
@@ -135,230 +135,230 @@ impl Display for NumberToWords<i64> {
 
 #[cfg(test)]
 mod tests {
-    use super::NumberToWords;
+    use super::NumbersToWords;
 
     #[test]
     fn displays_ones() {
-        let actual = NumberToWords::new(1);
+        let actual = NumbersToWords::new(1);
         assert_eq!(format!("{actual}"), "one");   
              
-        let actual = NumberToWords::new(9);
+        let actual = NumbersToWords::new(9);
         assert_eq!(format!("{actual}"), "nine");    
 
-        let actual = NumberToWords::new(8);
+        let actual = NumbersToWords::new(8);
         assert_eq!(format!("{actual}"), "eight");        
     }
 
     #[test]
     fn displays_teens() {
-        let actual = NumberToWords::new(10);
+        let actual = NumbersToWords::new(10);
         assert_eq!(format!("{actual}"), "ten");   
 
-        let actual = NumberToWords::new(19);
+        let actual = NumbersToWords::new(19);
         assert_eq!(format!("{actual}"), "nineteen");    
 
-        let actual = NumberToWords::new(17);
+        let actual = NumbersToWords::new(17);
         assert_eq!(format!("{actual}"), "seventeen");     
     }
 
     #[test]
     fn displays_hundreds() {
-        let actual = NumberToWords::new(100);
+        let actual = NumbersToWords::new(100);
         assert_eq!(format!("{actual}"), "one hundred");   
 
-        let actual = NumberToWords::new(999);
+        let actual = NumbersToWords::new(999);
         assert_eq!(format!("{actual}"), "nine hundred and ninety nine");   
 
-        let actual = NumberToWords::new(579);
+        let actual = NumbersToWords::new(579);
         assert_eq!(format!("{actual}"), "five hundred and seventy nine");        
 
-        let actual = NumberToWords::new(301);
+        let actual = NumbersToWords::new(301);
         assert_eq!(format!("{actual}"), "three hundred and one");     
     }
 
     #[test]
     fn displays_thousands() {
-        let actual = NumberToWords::new(1_000);
+        let actual = NumbersToWords::new(1_000);
         assert_eq!(format!("{actual}"), "one thousand");   
 
-        let actual = NumberToWords::new(9_999);
+        let actual = NumbersToWords::new(9_999);
         assert_eq!(format!("{actual}"), "nine thousand nine hundred and ninety nine");   
 
-        let actual = NumberToWords::new(9999);
+        let actual = NumbersToWords::new(9999);
         assert_eq!(format!("{actual}"), "nine thousand nine hundred and ninety nine");        
 
-        let actual = NumberToWords::new(6047);
+        let actual = NumbersToWords::new(6047);
         assert_eq!(format!("{actual}"), "six thousand and forty seven");     
     }
 
     #[test]
     fn displays_ten_thousands() {
-        let actual = NumberToWords::new(10_000);
+        let actual = NumbersToWords::new(10_000);
         assert_eq!(format!("{actual}"), "ten thousand");   
 
-        let actual = NumberToWords::new(99_999);
+        let actual = NumbersToWords::new(99_999);
         assert_eq!(format!("{actual}"), "ninety nine thousand nine hundred and ninety nine");   
 
-        let actual = NumberToWords::new(67232);
+        let actual = NumbersToWords::new(67232);
         assert_eq!(format!("{actual}"), "sixty seven thousand two hundred and thirty two");        
 
-        let actual = NumberToWords::new(86047);
+        let actual = NumbersToWords::new(86047);
         assert_eq!(format!("{actual}"), "eighty six thousand and forty seven");     
     }
 
     #[test]
     fn displays_hundred_thousands() {
-        let actual = NumberToWords::new(100_000);
+        let actual = NumbersToWords::new(100_000);
         assert_eq!(format!("{actual}"), "one hundred thousand");   
 
-        let actual = NumberToWords::new(999_999);
+        let actual = NumbersToWords::new(999_999);
         assert_eq!(format!("{actual}"), "nine hundred and ninety nine thousand nine hundred and ninety nine");   
 
-        let actual = NumberToWords::new(267232);
+        let actual = NumbersToWords::new(267232);
         assert_eq!(format!("{actual}"), "two hundred and sixty seven thousand two hundred and thirty two");        
 
-        let actual = NumberToWords::new(900047);
+        let actual = NumbersToWords::new(900047);
         assert_eq!(format!("{actual}"), "nine hundred thousand and forty seven");     
     }
 
     #[test]
     fn displays_millions() {
-        let actual = NumberToWords::new(1_000_000);
+        let actual = NumbersToWords::new(1_000_000);
         assert_eq!(format!("{actual}"), "one million");   
 
-        let actual = NumberToWords::new(9_999_999);
+        let actual = NumbersToWords::new(9_999_999);
         assert_eq!(format!("{actual}"), "nine million nine hundred and ninety nine thousand nine hundred and ninety nine");   
 
-        let actual = NumberToWords::new(6267232);
+        let actual = NumbersToWords::new(6267232);
         assert_eq!(format!("{actual}"), "six million two hundred and sixty seven thousand two hundred and thirty two");        
 
-        let actual = NumberToWords::new(2000590);
+        let actual = NumbersToWords::new(2000590);
         assert_eq!(format!("{actual}"), "two million and five hundred and ninety");     
     }
 
     #[test]
     fn displays_ten_millions() {
-        let actual = NumberToWords::new(10_000_000);
+        let actual = NumbersToWords::new(10_000_000);
         assert_eq!(format!("{actual}"), "ten million");   
 
-        let actual = NumberToWords::new(99_999_999);
+        let actual = NumbersToWords::new(99_999_999);
         assert_eq!(format!("{actual}"), "ninety nine million nine hundred and ninety nine thousand nine hundred and ninety nine");   
 
-        let actual = NumberToWords::new(16267232);
+        let actual = NumbersToWords::new(16267232);
         assert_eq!(format!("{actual}"), "sixteen million two hundred and sixty seven thousand two hundred and thirty two");        
 
-        let actual = NumberToWords::new(12000590);
+        let actual = NumbersToWords::new(12000590);
         assert_eq!(format!("{actual}"), "twelve million and five hundred and ninety");     
     }
 
     #[test]
     fn displays_hundred_millions() {
-        let actual = NumberToWords::new(100_000_000);
+        let actual = NumbersToWords::new(100_000_000);
         assert_eq!(format!("{actual}"), "one hundred million");   
 
-        let actual = NumberToWords::new(999_999_999);
+        let actual = NumbersToWords::new(999_999_999);
         assert_eq!(format!("{actual}"), "nine hundred and ninety nine million nine hundred and ninety nine thousand nine hundred and ninety nine");   
 
-        let actual = NumberToWords::new(416267232);
+        let actual = NumbersToWords::new(416267232);
         assert_eq!(format!("{actual}"), "four hundred and sixteen million two hundred and sixty seven thousand two hundred and thirty two");        
 
-        let actual = NumberToWords::new(112000590);
+        let actual = NumbersToWords::new(112000590);
         assert_eq!(format!("{actual}"), "one hundred and twelve million and five hundred and ninety");     
     }
 
     #[test]
     fn displays_billions() {
-        let actual = NumberToWords::new(1_000_000_000);
+        let actual = NumbersToWords::new(1_000_000_000);
         assert_eq!(format!("{actual}"), "one billion");   
 
-        let actual = NumberToWords::new(9_999_999_999);
+        let actual = NumbersToWords::new(9_999_999_999);
         assert_eq!(format!("{actual}"), "nine billion nine hundred and ninety nine million nine hundred and ninety nine thousand nine hundred and ninety nine");   
 
-        let actual = NumberToWords::new(8416267232);
+        let actual = NumbersToWords::new(8416267232);
         assert_eq!(format!("{actual}"), "eight billion four hundred and sixteen million two hundred and sixty seven thousand two hundred and thirty two");        
 
-        let actual = NumberToWords::new(1000000590);
+        let actual = NumbersToWords::new(1000000590);
         assert_eq!(format!("{actual}"), "one billion and five hundred and ninety");     
     }
 
     #[test]
     fn displays_ten_billions() {
-        let actual = NumberToWords::new(10_000_000_000);
+        let actual = NumbersToWords::new(10_000_000_000);
         assert_eq!(format!("{actual}"), "ten billion");   
 
-        let actual = NumberToWords::new(99_999_999_999);
+        let actual = NumbersToWords::new(99_999_999_999);
         assert_eq!(format!("{actual}"), "ninety nine billion nine hundred and ninety nine million nine hundred and ninety nine thousand nine hundred and ninety nine");   
 
-        let actual = NumberToWords::new(78416267232);
+        let actual = NumbersToWords::new(78416267232);
         assert_eq!(format!("{actual}"), "seventy eight billion four hundred and sixteen million two hundred and sixty seven thousand two hundred and thirty two");        
 
-        let actual = NumberToWords::new(11000000590);
+        let actual = NumbersToWords::new(11000000590);
         assert_eq!(format!("{actual}"), "eleven billion and five hundred and ninety");     
     }
 
     #[test]
     fn displays_hundred_billions() {
-        let actual = NumberToWords::new(100_000_000_000);
+        let actual = NumbersToWords::new(100_000_000_000);
         assert_eq!(format!("{actual}"), "one hundred billion");   
 
-        let actual = NumberToWords::new(999_999_999_999);
+        let actual = NumbersToWords::new(999_999_999_999);
         assert_eq!(format!("{actual}"), "nine hundred and ninety nine billion nine hundred and ninety nine million nine hundred and ninety nine thousand nine hundred and ninety nine");   
 
-        let actual = NumberToWords::new(478416267232);
+        let actual = NumbersToWords::new(478416267232);
         assert_eq!(format!("{actual}"), "four hundred and seventy eight billion four hundred and sixteen million two hundred and sixty seven thousand two hundred and thirty two");        
 
-        let actual = NumberToWords::new(111000000590);
+        let actual = NumbersToWords::new(111000000590);
         assert_eq!(format!("{actual}"), "one hundred and eleven billion and five hundred and ninety");     
     }
 
     #[test]
     fn displays_trillions() {
-        let actual = NumberToWords::new(1_000_000_000_000);
+        let actual = NumbersToWords::new(1_000_000_000_000);
         assert_eq!(format!("{actual}"), "one trillion");   
 
-        let actual = NumberToWords::new(9_999_999_999_999);
+        let actual = NumbersToWords::new(9_999_999_999_999);
         assert_eq!(format!("{actual}"), "nine trillion nine hundred and ninety nine billion nine hundred and ninety nine million nine hundred and ninety nine thousand nine hundred and ninety nine");   
 
-        let actual = NumberToWords::new(3478416267232);
+        let actual = NumbersToWords::new(3478416267232);
         assert_eq!(format!("{actual}"), "three trillion four hundred and seventy eight billion four hundred and sixteen million two hundred and sixty seven thousand two hundred and thirty two");        
 
-        let actual = NumberToWords::new(1000000000590);
+        let actual = NumbersToWords::new(1000000000590);
         assert_eq!(format!("{actual}"), "one trillion and five hundred and ninety");     
     }
 
     #[test]
     fn displays_ten_trillions() {
-        let actual = NumberToWords::new(10_000_000_000_000);
+        let actual = NumbersToWords::new(10_000_000_000_000);
         assert_eq!(format!("{actual}"), "ten trillion");   
 
-        let actual = NumberToWords::new(99_999_999_999_999);
+        let actual = NumbersToWords::new(99_999_999_999_999);
         assert_eq!(format!("{actual}"), "ninety nine trillion nine hundred and ninety nine billion nine hundred and ninety nine million nine hundred and ninety nine thousand nine hundred and ninety nine");   
 
-        let actual = NumberToWords::new(93478416267232);
+        let actual = NumbersToWords::new(93478416267232);
         assert_eq!(format!("{actual}"), "ninety three trillion four hundred and seventy eight billion four hundred and sixteen million two hundred and sixty seven thousand two hundred and thirty two");        
 
-        let actual = NumberToWords::new(10000000000590);
+        let actual = NumbersToWords::new(10000000000590);
         assert_eq!(format!("{actual}"), "ten trillion and five hundred and ninety");     
     }
 
     #[test]
     fn displays_hundred_trillions() {
-        let actual = NumberToWords::new(100_000_000_000_000);
+        let actual = NumbersToWords::new(100_000_000_000_000);
         assert_eq!(format!("{actual}"), "one hundred trillion");   
 
-        let actual = NumberToWords::new(999_999_999_999_999);
+        let actual = NumbersToWords::new(999_999_999_999_999);
         assert_eq!(format!("{actual}"), "nine hundred and ninety nine trillion nine hundred and ninety nine billion nine hundred and ninety nine million nine hundred and ninety nine thousand nine hundred and ninety nine");   
 
-        let actual = NumberToWords::new(293478416267232);
+        let actual = NumbersToWords::new(293478416267232);
         assert_eq!(format!("{actual}"), "two hundred and ninety three trillion four hundred and seventy eight billion four hundred and sixteen million two hundred and sixty seven thousand two hundred and thirty two");        
 
-        let actual = NumberToWords::new(700000000000590);
+        let actual = NumbersToWords::new(700000000000590);
         assert_eq!(format!("{actual}"), "seven hundred trillion and five hundred and ninety");     
     }
 
     #[test]
     fn displays_quadrillions() {
-        let actual = NumberToWords::new(1_000_000_000_000_000);
+        let actual = NumbersToWords::new(1_000_000_000_000_000);
         assert_eq!(format!("{actual}"), "one quadrillion");             
     }
 }
