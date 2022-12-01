@@ -1,7 +1,7 @@
 use std::env;
 
 use number_renderer::{NumbersToWords, Validator};
-use fizz_buzz::{FizzBuzzNumber};
+use fizz_buzz::{FizzBuzz};
 
 fn main() {
     println!("Numbers to words");
@@ -15,6 +15,6 @@ fn main() {
 
     println!("Fizzbuzz");
     for i in 1..=100 {
-        print!("{}, ", FizzBuzzNumber::new(i))
+        print!("{}, ", FizzBuzz::new(i))
     }
 }
