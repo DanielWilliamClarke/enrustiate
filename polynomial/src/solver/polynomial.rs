@@ -14,3 +14,29 @@ impl Polynomial {
         }) == 0
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{Polynomial, Term};
+
+    #[test]
+    fn has_x_intercept() {
+        let p = Polynomial(vec![
+            Term {
+                value: 2,
+                power: 2
+            },
+            Term {
+                value: -2,
+                power: 1
+            },
+            Term {
+                value: -4,
+                power: 0
+            },
+        ]);
+
+        assert_eq!(p.has_x_intercept(-1), true);
+        assert_eq!(p.has_x_intercept(5), false);
+    }
+}
