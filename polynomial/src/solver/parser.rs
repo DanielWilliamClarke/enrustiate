@@ -25,7 +25,13 @@ impl Display for ParserError {
 pub struct Parser;
 
 impl Parser {
-    fn parse(input: &str) -> Result<Polynomial, ParserError> {
+    fn parse(input: &str) -> Result<Polynomial, ParserError> { 
+        // clean up input
+        let input = input
+            .chars()
+            .filter(|c| !c.is_whitespace())
+            .collect::<String>();
+
         let captures =
             // capture groups   ( 1 )     (           2            )
             //                             (  3  ) ( 4 )   (  5  )
@@ -33,7 +39,7 @@ impl Parser {
 
         // Look ahead to get total captures
         let total_caps = captures
-            .captures_iter(input.trim())
+            .captures_iter(&input)
             .count();
 
         // Parse each capture
@@ -236,14 +242,11 @@ mod tests {
             "asdasd",
             "-",
             "+",
-            "2x  ^2 ",
             "2x - ^2  2x",
             "2x  + ^2 - 2x asd",
             "2x  / ^2 - 2x asd",
             "2x  + ^2 * 2x asd",
-            "a <- x + 2",
             "(2x  + ^2)(2x  - 2)",
-            "2x^2   -2x  -  4x^3 -     123x    ^123+10",
             "[[[[[[]]]]]"
         ];
 
