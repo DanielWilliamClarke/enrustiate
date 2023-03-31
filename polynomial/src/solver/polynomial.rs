@@ -36,7 +36,7 @@ mod tests {
             },
         ]);
 
-        assert_eq!(p.has_x_intercept(-1), true);
-        assert_eq!(p.has_x_intercept(5), false);
+        assert!(p.has_x_intercept(-1));
+        assert!(!p.has_x_intercept(5));
     }
 }
