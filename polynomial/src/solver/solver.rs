@@ -3,7 +3,7 @@ use super::Polynomial;
 pub struct Solver;
 
 impl Solver {   
-    fn solve(polynomial: &Polynomial) -> Vec<i32> {
+    pub fn solve(polynomial: &Polynomial) -> Vec<i32> {
         (-10..=10)
             .filter(|&x| polynomial.has_x_intercept(x))
             .collect()

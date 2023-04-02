@@ -29,7 +29,7 @@ impl Display for ParserError {
 pub struct Parser;
 
 impl Parser {
-    fn parse(input: &str) -> Result<Polynomial, ParserError> {
+    pub fn parse(input: &str) -> Result<Polynomial, ParserError> {
         let captures =
             // capture groups   ( 1 )     (           2            )
             //                             (  3  ) ( 4 )   (  5  )
@@ -107,7 +107,7 @@ impl Parser {
         match terms.len() {
             0 => Err(ParserError::EmptyPolynomial),
             1 => match terms.first() {
-                Some(Term { value, power }) if (*value).abs() == 1 && *power == 0 => {
+                Some(Term { value, power }) if *power == 0 => {
                     Err(ParserError::IsScalar(*value))
                 }
                 _ => Ok(terms),
@@ -252,6 +252,7 @@ mod tests {
     fn will_return_invalid_term_for_malformed_polynomial() {
         let polynomials = vec![
             "",
+            "1000",
             "asdasd",
             "-",
             "+",
