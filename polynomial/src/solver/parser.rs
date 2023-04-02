@@ -6,6 +6,8 @@ use super::{Polynomial, Term};
 
 #[derive(Debug)]
 pub enum ParserError {
+    EmptyPolynomial,
+    IsScalar(i32),
     InvalidTerm(String),
     MissingTerm(usize),
 }
@@ -14,6 +16,8 @@ impl std::error::Error for ParserError {}
 impl Display for ParserError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            ParserError::EmptyPolynomial => write!(f, "Parser Error: polynomial is empty"),
+            ParserError::IsScalar(err) => write!(f, "Parser Error: polynomial is scaler {}", err),
             ParserError::InvalidTerm(err) => write!(f, "Parser Error: invalid term {}", err),
             ParserError::MissingTerm(err) => {
                 write!(f, "Parser Error: Missing Term in group {}", err)
@@ -25,37 +29,38 @@ impl Display for ParserError {
 pub struct Parser;
 
 impl Parser {
-    fn parse(input: &str) -> Result<Polynomial, ParserError> { 
+    fn parse(input: &str) -> Result<Polynomial, ParserError> {
+        let captures =
+            // capture groups   ( 1 )     (           2            )
+            //                             (  3  ) ( 4 )   (  5  )
+            Regex::new(r"\s*([-+])?\s*(([0-9]*)(\w?)\^?([0-9]*))?").expect("valid regex");
+
         // clean up input
         let input = input
             .chars()
             .filter(|c| !c.is_whitespace())
             .collect::<String>();
 
-        let captures =
-            // capture groups   ( 1 )     (           2            )
-            //                             (  3  ) ( 4 )   (  5  )
-            Regex::new(r"\s*([-+])?\s*(([0-9]*)(\w?)\^?([0-9]*))?").expect("valid regex");
-
-        // Look ahead to get total captures
-        let total_caps = captures
-            .captures_iter(&input)
-            .count();
-
         // Parse each capture
         let terms = captures
-            .captures_iter(input.trim()).enumerate()
-            .map(|(index, caps)| Parser::parse_term(index, caps, total_caps))
-            .collect();
+            .captures_iter(&input)
+            .enumerate()
+            .map(|(index, caps)| {
+                Ok(Term {
+                    value: Parser::parse_value(index, &caps)?,
+                    power: Parser::parse_power(&caps),
+                })
+            })
+            .collect::<Result<Vec<Term>, ParserError>>();
 
         // Handle result
-        match terms {
+        match Parser::validate_polynomial(terms) {
             Ok(terms) => Ok(Polynomial(terms)),
             Err(err) => Err(err),
         }
     }
 
-    fn parse_term(index: usize, caps: Captures, total_caps: usize) -> Result<Term, ParserError> {
+    fn parse_value(index: usize, caps: &Captures) -> Result<i32, ParserError> {
         // Grab raw term for validation
         let raw_term = match caps.get(2) {
             Some(raw_term) => raw_term.as_str().to_string(),
@@ -64,20 +69,8 @@ impl Parser {
 
         // Parse term sign, if no sign is seen after the first term, this polynomial is invalid
         let sign = match caps.get(1) {
-            Some(sign) => {
-                if sign.as_str() == "-" {
-                    -1
-                } else {
-                    1
-                }
-            }
-            None => {
-                if index == 0 {
-                    1
-                } else {
-                    return Err(ParserError::InvalidTerm(raw_term));
-                }
-            }
+            Some(sign) => if sign.as_str() == "-" { -1 } else { 1 } ,
+            None => if index == 0 { 1 } else { return Err(ParserError::InvalidTerm(raw_term)) }
         };
 
         // Parse value applying the sign
@@ -86,6 +79,10 @@ impl Parser {
             .map_or(1, |c| c.as_str().parse::<i32>().unwrap_or(1))
             * sign;
 
+        Ok(value)
+    }
+
+    fn parse_power(caps: &Captures) -> u32 {
         // Determine implicit power
         let default_power = caps
             .get(4)
@@ -96,12 +93,27 @@ impl Parser {
             c.as_str().parse::<u32>().unwrap_or(default_power)
         });
 
-        // Validate term
-        if total_caps == 1 && value.abs() == 1 && power == 0 {
-            return Err(ParserError::InvalidTerm(raw_term));
-        } 
+        power
+    }
 
-        Ok(Term { value, power })
+    fn validate_polynomial(
+        terms: Result<Vec<Term>, ParserError>,
+    ) -> Result<Vec<Term>, ParserError> {
+        let terms = match terms {
+            Ok(terms) => terms,
+            Err(err) => Err(err)?,
+        };
+
+        match terms.len() {
+            0 => Err(ParserError::EmptyPolynomial),
+            1 => match terms.first() {
+                Some(Term { value, power }) if (*value).abs() == 1 && *power == 0 => {
+                    Err(ParserError::IsScalar(*value))
+                }
+                _ => Ok(terms),
+            },
+            _ => Ok(terms),
+        }
     }
 }
 
@@ -239,6 +251,7 @@ mod tests {
     #[test]
     fn will_return_invalid_term_for_malformed_polynomial() {
         let polynomials = vec![
+            "",
             "asdasd",
             "-",
             "+",
@@ -247,7 +260,7 @@ mod tests {
             "2x  / 2 - 2x",
             "2x  + 2 * 2x",
             "(2x  + 2)(2x  - 2)",
-            "[[[[[[]]]]]"
+            "[[[[[[]]]]]",
         ];
 
         polynomials.iter().for_each(|polynomial| {
@@ -256,7 +269,7 @@ mod tests {
                 Ok(terms) => {
                     println!("{:?}", terms);
                     panic!("should return ParserError::InvalidTerm")
-                },
+                }
                 Err(err) => println!("{} | {}", err, polynomial),
             }
         });
