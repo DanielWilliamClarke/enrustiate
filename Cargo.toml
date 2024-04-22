@@ -1,3 +1,4 @@
+workspace = { members = ["tone_gen"] }
 [package]
 name = "numbers_to_words"
 version = "0.1.0"
@@ -8,6 +9,7 @@ edition = "2021"
 [dependencies]
 number_renderer = { path = './number_renderer' }
 fizz_buzz = { path = './fizz_buzz' }
+tone_gen = { path = './tone_gen' }
 
 [dev-dependencies]
 criterion = "0.3"
