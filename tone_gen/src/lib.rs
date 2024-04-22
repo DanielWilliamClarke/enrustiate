@@ -1,3 +1,4 @@
+use colored::Colorize;
 use rand::{
     distributions::{Distribution, Standard},
     Rng,
@@ -42,21 +43,21 @@ impl Distribution<Note> for Standard {
 impl Display for Note {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let rendered_note = match self {
-            Note::A => "A ",
-            Note::Ab => "A♭",
-            Note::B => "B ",
-            Note::C => "C ",
-            Note::Cb => "C♭",
-            Note::D => "D ",
-            Note::Db => "D♭",
-            Note::E => "E ",
-            Note::F => "F ",
-            Note::Fb => "F♭",
-            Note::G => "G ",
-            Note::Gb => "G♭",
+            Note::A => "A♮".bright_red(),
+            Note::Ab => "A♭".red(),
+            Note::B => "B♮".bright_yellow(),
+            Note::C => "C♮".bright_green(),
+            Note::Cb => "C♭".green(),
+            Note::D => "D♮".bright_blue(),
+            Note::Db => "D♭".blue(),
+            Note::E => "E♮".bright_magenta(),
+            Note::F => "F♮".bright_purple(),
+            Note::Fb => "F♭".purple(),
+            Note::G => "G♮".bright_cyan(),
+            Note::Gb => "G♭".cyan(),
         };
 
-        write!(f, "{}", rendered_note)
+        write!(f, "{}", rendered_note.bold().italic())
     }
 }
 
@@ -79,9 +80,9 @@ impl Distribution<Chord> for Standard {
 impl Display for Chord {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Chord::Major(note) => write!(f, "{} Major", note),
-            Chord::Minor(note) => write!(f, "{} Minor", note),
-            Chord::Seven(note) => write!(f, "{} Seven", note),
+            Chord::Major(note) => write!(f, "{} {}", note, "Major".dimmed()),
+            Chord::Minor(note) => write!(f, "{} {}", note, "Minor".dimmed()),
+            Chord::Seven(note) => write!(f, "{} {}", note, "Seven".dimmed()),
         }
     }
 }
