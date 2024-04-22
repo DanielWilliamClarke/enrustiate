@@ -87,10 +87,33 @@ impl Display for Chord {
     }
 }
 
-pub struct Sheet(pub Vec<Vec<Chord>>);
+pub enum RootString {
+    Six(Chord),
+    Five(Chord),
+}
 
-impl FromIterator<Vec<Chord>> for Sheet {
-    fn from_iter<T: IntoIterator<Item = Vec<Chord>>>(iter: T) -> Self {
+impl Distribution<RootString> for Standard {
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> RootString {
+        match rng.gen_range(0..=1) {
+            0 => RootString::Six(rand::random()),
+            _ => RootString::Five(rand::random()),
+        }
+    }
+}
+
+impl Display for RootString {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            RootString::Six(chord) => write!(f, "{}: {}", "6".underline(), chord),
+            RootString::Five(chord) => write!(f, "{}: {}", "5".underline(), chord),
+        }
+    }
+}
+
+pub struct Sheet(pub Vec<Vec<RootString>>);
+
+impl FromIterator<Vec<RootString>> for Sheet {
+    fn from_iter<T: IntoIterator<Item = Vec<RootString>>>(iter: T) -> Self {
         Sheet(iter.into_iter().collect())
     }
 }
@@ -100,8 +123,8 @@ impl From<(usize, usize)> for Sheet {
         (0..total)
             .map(|_| {
                 (0..length)
-                    .map(|_| rand::random::<Chord>())
-                    .collect::<Vec<Chord>>()
+                    .map(|_| rand::random::<RootString>())
+                    .collect::<Vec<RootString>>()
             })
             .collect::<Sheet>()
     }
@@ -114,7 +137,7 @@ impl Display for Sheet {
         self.0.iter().for_each(|line| {
             let run = line
                 .iter()
-                .map(|chord| chord.to_string())
+                .map(|string| string.to_string())
                 .collect::<Vec<String>>()
                 .join(" -> ");
 
@@ -140,7 +163,7 @@ mod tests {
             .0
             .into_iter()
             .flat_map(|inner_vec| inner_vec)
-            .collect::<Vec<Chord>>();
+            .collect::<Vec<RootString>>();
 
         assert_eq!(flat.len(), total * length);
     }

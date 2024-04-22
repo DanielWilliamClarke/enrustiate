@@ -4,26 +4,32 @@ A small tool to generate Chord patterns to practice with as a learning tool for 
 
 This tool outputs `total * length` chord patterns:
 
+Each Chord is comprised of:
+
+`<String number>: <note> <chord family>`
+
+Example:
+
 ```bash
 🎸🎸🎸 Generating Chords 🎶🎶🎶
 
-🎼 C♮ Seven -> F♭ Major -> A♮ Minor -> A♭ Seven
+🎼 6: G♮ Minor -> 6: B♮ Seven -> 5: G♭ Seven -> 6: E♮ Minor
 
-🎼 D♮ Major -> C♭ Minor -> A♭ Major -> C♭ Minor
+🎼 6: G♭ Major -> 6: A♮ Seven -> 5: F♭ Major -> 6: D♮ Major
 
-🎼 D♭ Major -> D♮ Seven -> A♭ Minor -> D♭ Minor
+🎼 6: B♮ Minor -> 6: A♮ Major -> 6: C♮ Minor -> 6: C♮ Seven
 
-🎼 E♮ Minor -> C♭ Seven -> F♮ Minor -> C♮ Seven
+🎼 6: A♭ Minor -> 5: A♮ Minor -> 5: C♭ Major -> 5: E♮ Seven
 
-🎼 A♮ Major -> D♭ Major -> C♮ Major -> A♭ Minor
+🎼 5: E♮ Minor -> 5: F♭ Major -> 6: G♭ Major -> 6: F♮ Seven
 
-🎼 C♮ Minor -> A♮ Seven -> E♮ Major -> F♮ Major
+🎼 6: G♭ Major -> 5: F♭ Major -> 5: D♭ Major -> 5: D♭ Minor
 
-🎼 F♭ Seven -> E♮ Major -> G♭ Seven -> C♮ Major
+🎼 6: B♮ Seven -> 6: C♭ Seven -> 5: A♭ Minor -> 6: C♮ Seven
 
-🎼 D♭ Major -> E♮ Major -> A♮ Minor -> G♮ Major
+🎼 5: A♮ Minor -> 5: F♮ Major -> 6: D♭ Seven -> 6: A♮ Seven
 
-🎼 A♮ Minor -> G♭ Minor -> E♮ Seven -> D♮ Minor
+🎼 5: C♭ Minor -> 5: A♭ Seven -> 5: F♮ Minor -> 5: F♮ Major
 
-🎼 G♭ Major -> G♮ Minor -> C♮ Major -> D♭ Minor
+🎼 6: D♮ Seven -> 6: B♮ Seven -> 6: F♭ Major -> 6: G♮ Major
 ```
