@@ -94,6 +94,18 @@ impl FromIterator<Vec<Chord>> for Sheet {
     }
 }
 
+impl From<(usize, usize)> for Sheet {
+    fn from((total, length): (usize, usize)) -> Self {
+        (0..total)
+            .map(|_| {
+                (0..length)
+                    .map(|_| rand::random::<Chord>())
+                    .collect::<Vec<Chord>>()
+            })
+            .collect::<Sheet>()
+    }
+}
+
 impl Display for Sheet {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "🎸🎸🎸 Generating Chords 🎶🎶🎶\n").ok();
@@ -112,16 +124,6 @@ impl Display for Sheet {
     }
 }
 
-pub fn generate_chords(total: usize, length: usize) -> Sheet {
-    (0..total)
-        .map(|_| {
-            (0..length)
-                .map(|_| rand::random::<Chord>())
-                .collect::<Vec<Chord>>()
-        })
-        .collect::<Sheet>()
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -131,7 +133,7 @@ mod tests {
         let total = 100;
         let length = 100;
 
-        let result = generate_chords(total, length);
+        let result = Sheet::from((total, length));
 
         let flat = result
             .0

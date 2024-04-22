@@ -1,5 +1,5 @@
-use tone_gen::generate_chords;
+use tone_gen::Sheet;
 
 fn main() {
-    println!("{}", generate_chords(10, 4));
+    println!("{}", Sheet::from((10, 4)));
 }
