@@ -7,35 +7,35 @@ use rand::{
 use std::fmt::Display;
 
 pub enum Note {
-    A,
     Ab,
+    A,
+    Bb,
     B,
     C,
-    Cb,
-    D,
     Db,
+    D,
+    Eb,
     E,
     F,
-    Fb,
-    G,
     Gb,
+    G,
 }
 
 impl Distribution<Note> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Note {
         match rng.gen_range(0..=11) {
-            0 => Note::A,
-            1 => Note::Ab,
-            2 => Note::B,
-            3 => Note::C,
-            4 => Note::Cb,
-            5 => Note::D,
-            6 => Note::Db,
-            7 => Note::E,
-            8 => Note::F,
-            9 => Note::Fb,
-            10 => Note::G,
-            _ => Note::Gb,
+            0 => Note::Ab,
+            1 => Note::A,
+            2 => Note::Bb,
+            3 => Note::B,
+            4 => Note::C,
+            5 => Note::Db,
+            6 => Note::D,
+            7 => Note::Eb,
+            8 => Note::E,
+            9 => Note::F,
+            10 => Note::Gb,
+            _ => Note::G,
         }
     }
 }
@@ -43,18 +43,18 @@ impl Distribution<Note> for Standard {
 impl Display for Note {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let rendered_note = match self {
-            Note::A => "A♮".bright_red(),
             Note::Ab => "A♭".red(),
+            Note::A => "A♮".bright_red(),
+            Note::Bb => "B♭".yellow(),
             Note::B => "B♮".bright_yellow(),
             Note::C => "C♮".bright_green(),
-            Note::Cb => "C♭".green(),
-            Note::D => "D♮".bright_blue(),
             Note::Db => "D♭".blue(),
+            Note::D => "D♮".bright_blue(),
+            Note::Eb => "E♭".magenta(),
             Note::E => "E♮".bright_magenta(),
             Note::F => "F♮".bright_purple(),
-            Note::Fb => "F♭".purple(),
-            Note::G => "G♮".bright_cyan(),
             Note::Gb => "G♭".cyan(),
+            Note::G => "G♮".bright_cyan(),
         };
 
         write!(f, "{}", rendered_note.bold().italic())
