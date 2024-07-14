@@ -1,4 +1,5 @@
-workspace = { members = ["tone_gen"] }
+workspace = { members = ["tone_gen", "wall_spacer"] }
+
 [package]
 name = "numbers_to_words"
 version = "0.1.0"
