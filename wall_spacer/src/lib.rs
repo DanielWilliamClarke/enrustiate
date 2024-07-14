@@ -1,3 +1,11 @@
+/**
+ * I recently needed to calculate the center points
+ * of some picture frame where each frame should
+ * be equidistant from the sides of the walls and each next frame
+ * this function calculate the center points of each frame
+ * it can even position frames of different wides equally along a wall
+ */
+
 pub fn calc_frame_center_points(wall_width: f32, frame_widths: Vec<f32>) -> Vec<f32> {
     let full_frame_width = frame_widths.iter().sum::<f32>();
     let wall_gaps = (frame_widths.len() + 1) as f32;
