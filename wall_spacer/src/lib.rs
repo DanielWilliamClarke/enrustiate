@@ -1,4 +1,5 @@
 use std::fmt::{Display, Formatter};
+use rand::Rng;
 
 /**
  * I recently needed to calculate the center points
@@ -28,26 +29,6 @@ impl Display for WallSpacer {
         let wall_gap_width = self.calc_gap_width();
         let wall_gap_percentage = wall_gap_width / self.wall_width;
         let gap_chars = (display_length * wall_gap_percentage).ceil() as usize;
-
-        let center_points = self.calc_frame_center_points();
-
-        let mut previous = 0f32;
-        for center in center_points.iter() {
-            let center_text_length = format!("{:.1}", center);
-            let center_text_center = center_text_length.len() / 2;
-
-            let distance = center - previous;
-            previous = center + center_text_length.len() as f32;
-
-            let pos_percentage = distance / self.wall_width;
-            let pos_chars = (display_length * pos_percentage).ceil() as usize;
-
-            // add padding
-            write!(f, "{: <1$}", "", pos_chars - center_text_center)?;
-            // display center point
-            write!(f, "{:.1}", center)?;
-        }
-        writeln!(f)?;
 
         // draw initial gap
         write!(f, "{:-<1$}", "", gap_chars)?;
@@ -84,12 +65,59 @@ impl Display for WallSpacer {
                 write!(f, "{:-<1$}", "", gap_chars)?;
             }
         }
+        writeln!(f)?;
+
+        let center_points = self.calc_frame_center_points();
+
+        let mut previous = 0f32;
+        for center in center_points.iter() {
+            let formatted = self.format_center_point(center);
+            let formatted_center = formatted.len() / 2;
+
+            let distance = center - previous - formatted_center as f32;
+            previous = center + formatted.len() as f32;
+
+            let pos_percentage = distance / self.wall_width;
+            let pos_chars = (display_length * pos_percentage).floor() as usize;
+
+            // add padding
+            write!(f, "{:<1$}", "", pos_chars)?;
+
+            // display center point
+            write!(f, "{}", formatted)?;
+        }
+        writeln!(f)?;
 
         Ok(())
     }
 }
 
 impl WallSpacer {
+
+    fn format_center_point(&self, center_point: &f32) -> String {
+        // Format the center_point to 1 decimal place
+        let formatted = format!("{:.1}", center_point);
+
+        // Calculate the length of the formatted string
+        let len = formatted.len();
+
+        // Calculate the total padding needed to make the string 8 characters long
+        let total_padding = if len % 2 == 0 {
+            8 - len
+        } else {
+            7 - len
+        };
+
+        // Calculate the left and right padding
+        let left_padding = total_padding / 2;
+        let right_padding = total_padding - left_padding;
+
+        // Format the final string with the number centered and padded with spaces
+        format!("{:>width$}", formatted, width = len + left_padding)
+            + &" ".repeat(right_padding)
+    }
+
+
     fn calc_gap_width(&self) -> f32 {
         let full_frame_width = self.frame_widths.iter().sum::<f32>();
         let wall_gaps = (self.frame_widths.len() + 1) as f32;
@@ -116,6 +144,17 @@ impl WallSpacer {
 mod tests {
     use super::*;
 
+    fn generate_random_arrays(n: usize) -> Vec<Vec<f32>> {
+        let mut rng = rand::thread_rng();
+        (0..n)
+            .map(|_| {
+                (0..rng.gen_range(2..10))
+                    .map(|_| rng.gen_range(10f32..100f32))
+                    .collect()
+            })
+            .collect()
+    }
+
     #[test]
     fn generates_center_points_23cm_frames() {
         let spacer = WallSpacer::from((212f32, vec![23f32, 23f32, 23f32, 23f32]));
@@ -137,12 +176,11 @@ mod tests {
     }
 
     #[test]
-    fn generates_center_points_with_growing_frames() {
-        let spacer = WallSpacer::from((1000f32, vec![8f32, 16f32, 32f32, 64f32, 128f32, 256f32]));
-        // let result = spacer.calc_frame_center_points();
+    fn generate_walls() {
+        generate_random_arrays(50).iter().for_each(|a| {
+            let spacer = WallSpacer::from((1000f32, a.to_owned()));
 
-        println!("{}", spacer);
-
-        // assert_eq!(result, vec![29.166666f32, 65.83333f32, 123.5f32, 185.16666f32, 223.33333f32])
+            println!("{}", spacer);
+        });
     }
 }
