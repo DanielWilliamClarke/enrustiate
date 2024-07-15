@@ -25,7 +25,7 @@ impl From<(f32, Vec<f32>)> for WallSpacer {
 
 impl Display for WallSpacer {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        let display_length = 150f32;
+        let display_length = 100f32;
         let wall_gap_width = self.calc_gap_width();
         let wall_gap_percentage = wall_gap_width / self.wall_width;
         let gap_chars = (display_length * wall_gap_percentage).ceil() as usize;
@@ -67,10 +67,14 @@ impl Display for WallSpacer {
         }
         writeln!(f)?;
 
-        let center_points = self.calc_frame_center_points();
+        let widths_with_points = self.frame_widths
+            .iter()
+            .zip(self.calc_frame_center_points())
+            .collect::<Vec<(&f32, f32)>>();
 
+        write!(f, "{:<1$}", "", gap_chars)?;
         let mut previous = 0f32;
-        for center in center_points.iter() {
+        for (width, center) in widths_with_points.iter() {
             let formatted = self.format_center_point(center);
             let formatted_center = formatted.len() / 2;
 
@@ -81,10 +85,11 @@ impl Display for WallSpacer {
             let pos_chars = (display_length * pos_percentage).floor() as usize;
 
             // add padding
-            write!(f, "{:<1$}", "", pos_chars)?;
+            // write!(f, "{:<1$}", "", width as f32)?;
 
             // display center point
             write!(f, "{}", formatted)?;
+            write!(f, "{:<1$}", "", gap_chars - formatted_center)?;
         }
         writeln!(f)?;
 
